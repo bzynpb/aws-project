@@ -18,5 +18,5 @@ def fourth(id):
 
 if __name__ == '__main__':
 
-     app.run(debug=True) #hata ayiklama modu devrede
-     app.run(host= '0.0.0.0', port=8080)  #instance icinde calistirmak icin
+     # app.run(debug=True) #hata ayiklama modu devrede
+     app.run(host= '0.0.0.0', port=80)  #instance icinde calistirmak icin
