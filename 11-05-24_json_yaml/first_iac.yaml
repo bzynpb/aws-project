@@ -1,0 +1,20 @@
+#cfn yazinca template geliyor
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  Bu template SSH ile baglantiyi mumkun kilan bir instance yaratan templatedir. ami-id'si bile hardcoded bir sekilde yazilmistir. Daha sonra isterseniz bunu degistirebilirsiniz.   
+
+Resources:
+  #ec2 yazinca ozellikler geliyor, instance yazmak dahaq mantikli
+  BZBFirstCFNInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: "String"
+      InstanceType: "String"
+      KeyName: "String"
+      SecurityGroupIds: 
+        - "String"
+      SecurityGroups: 
+        - "String"
+      Tags: 
+        - Key: "String"
+          Value: "String"
