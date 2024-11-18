@@ -122,10 +122,12 @@ Keep it as it is
 yum update -y
 #install apache server
 yum install -y httpd
-# get private ip address of ec2 instance using instance metadata
+# get private ip address of ec2 instance using instance metadata 
+# amazonun ozel adresi, tokenden deger geldikten sonra diger islem calisiyor ve orada kullaniyor
 TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
 && PRIVATE_IP=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4`
 # get public ip address of ec2 instance using instance metadata
+# instance'in private adresini gosterir
 TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
 && PUBLIC_IP=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4` 
 # get date and time of server
@@ -246,10 +248,10 @@ VPC          : Default VPC
 Mappings     : Select all AZ's
 ```
 
-- Security groups
+- Security groups (sadece 80 portu olan yeni bir security group olusturup onu ekledik)
 
 ```text
-Security groups  : Remove Default SG and select ALBSecGroup
+Security groups  : Remove Default SG and select ALBSecGroup 
 ```
 
 - Listeners and routing
