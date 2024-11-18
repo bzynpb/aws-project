@@ -1,5 +1,4 @@
 # Hands-on EC2-02 : How to Install Nginx Web Server on EC2 Linux 2
-
 Purpose of the this hands-on training is to give the students basic knowledge of how to install Nginx Web Server on Amazon Linux 2 EC2 instance.
 
 ## Learning Outcomes

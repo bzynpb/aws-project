@@ -3,11 +3,8 @@
 ## Outline
 
 - Part 1 - Getting to know the Apache Web Server
-
 - Part 2 - Launching an Amazon Linux 2 EC2 instance and Connect with SSH
-
 - Part 3 - Installing and Configuring Apache Web Server to Run `Hello World` Page
-
 - Part 4 - Automation of Web Server Installation through Bash Script
 
 ## Part 1 - Getting to know the Apache Web Server
@@ -28,7 +25,6 @@ Securtiy Group: "0.0.0.0/0-----> Port 22"
 
 2. Connect to your instance with SSH.
 
-
 ssh -i .....pem ec2-user@
 
 
@@ -37,50 +33,39 @@ ssh -i .....pem ec2-user@
 # STEP_1_ Default Apache Web Server
 
 3. Update the installed packages and package cache on your instance.
-
-
 sudo yum update -y
 #sudo dnf update -y
 
 4. Install the Apache Web Server-default page
-
-
 sudo yum install httpd -y
 #sudo dnf install httpd -y
 
 5. Check status of the Apache Web Server. show taht it is not running(Red). After that Start the Apache Web Server.
-
-sudo systemctl status httpd
-sudo systemctl start httpd
-
+sudo systemctl status httpd  # aktif mi inaktif mi
+sudo systemctl start httpd  # aktiflestirdik
 
 6. Check status of the Apache Web Server.Show that it is running (Green)
-
-
-sudo systemctl status httpd
+sudo systemctl status httpd  # apachi kurulumu yapilinca, public IP'de "It Works!" cikiyor
 
 7. Enable the Apache Web Server to survive the restarts then Check from browser with DNS.  Since the security group is available only for add HTTP add port 80 and show again.
 
-sudo systemctl enable httpd
+sudo systemctl enable httpd  
+# server apachi ile baslasin, makina stop edip tekrar baslasa da apachi calismaya devam edecek
 
 Security Group: "0.0.0.0/0-----> Port 80"
 
 # STEP_2_ Basic Customization of  Apache Web Server
 
 8. Check the default settings 
-
 cd /etc/httpd/conf.d/
 cd /usr/share/httpd/noindex
 
 9. Set permission of the files and folders under `/var/www/html/` folder to everyone.
-
-
 sudo chmod -R 777 /var/www/html
 
-
 10. Go to the /var/www/html
-
 cd /var/www/html
+# apachi calisacaksa bu dosyanin altina eklenmeli. 
 
 11. Create a custom `index.html` file under `/var/www/html/` folder to be served on the Server.
 
@@ -159,7 +144,5 @@ systemctl enable httpd
 21. Once Instance is on, check if the Apache Web Server is working from the web browser.
 
 22. Connect the Apache Web Server from the local terminal with `curl` command.
-
-
 curl http://ec2-3-15-183-78.us-east-2.compute.amazonaws.com8.us-east-2.compute.amazonaws.com
 
