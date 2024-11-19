@@ -1,6 +1,5 @@
 ## AWS CLI Session 1 : 
 
-
 - This hands on explains how to install and configure AWS CLI. We'll also see how to create and manipulate the resources in AWS via AWS CLI 
 
 ### References
@@ -8,43 +7,32 @@
 - https://awscli.amazonaws.com/v2/documentation/api/latest/index.html
 - https://docs.aws.amazon.com/linux/al2023/ug/get-started.html
 
-
 ## Learning Outcomes
 
 At the end of the this hands-on training, students will be able to;
 
 - installing CLI on Windows, Linux or MAC O/S
-
 - configuring CLI
-
 - creating a resources with CLI
-
 - working with Amazon Linux 2023 AMI
 
 ## Outline
 
 - Part 1 - Installation
-
 - Part 2 - Configuration
-
 - Part 3 - Examples of the CLI commands
-
 - Part 4 - Working with the latest Amazon Linux 2023 AMI
-
 
 ## Part 1 - Installation
 
 ### Step-1  Installation CLI on your "Local" 
 
 - You can use the link below to install AWS CLI V2 according to your O/S.
-
 - General page:
 https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
-
 - Windows:
 https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-
 
 - Mac:
 https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
