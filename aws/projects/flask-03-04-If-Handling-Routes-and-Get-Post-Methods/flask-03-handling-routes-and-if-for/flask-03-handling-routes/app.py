@@ -34,8 +34,8 @@ def admin():
     return redirect(url_for('error'))
 
 
-# # Create a function named greet which return formatted inline html string 
-# # and assign to the dynamic route of ('/<name>')
+# Create a function named greet which return formatted inline html string 
+# and assign to the dynamic route of ('/<name>')
 @app.route('/<name>')
 def greet(name):
     greet_format=f"""
