@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+# cfn-template
+Description: |
+  Cloudformation Template for Roman Numerals Converter Application. This template creates Python Flask Web Application on Linux 2.
+
+Parameters:
+  #Parameter yazinca cikti
+  KeyName: 
+    Description: Select your keypair
+    Type: AWS::EC2::KeyPair::Keyname
+    Default: firstkey # kullanilan keypair icinden secilecek, default olarak bu gelsin
+
+# 2.parametre guncel 
+# ssm parameter 
+# console parameter store icinden ariyoruz 
+  LatestAmiId:
+      Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+      Default:  '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+Resources:
+# ec2-security sectik
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow 22 and 80 port# Required
+      SecurityGroupIngress: # makinaya gelen trafik
+        - CidrIp: 0.0.0.0/0 # onemli
+          FromPort: 22 # onemli
+          IpProtocol: tcp # onemli, kendi otomatik tcp secer
+          ToPort: 22
+        - CidrIp: 0.0.0.0/0 # onemli
+          FromPort: 80 
+          IpProtocol: tcp 
+          ToPort: 80
+
+  # ec2 instance secip ilgili yerleri tuttuk, digerlerini sildik
+  WebServerHost:
+    Type: AWS::EC2::Instance
+    Properties:    
+      ImageId: !Ref LatestAmiId 
+      InstanceType: t2.micro
+      KeyName: !Ref KeyName
+      SecurityGroupIds: #varolan security grubu referans gosterecegimiz icin securitygroupID sectik
+        - !Ref WebSecurityGroup
+      Tags: 
+        - Key: Name
+          Value: !Sub Web Server of ${AWS::StackName}  # disardan cagiriyoruz, 
+          # dokumanlarda intrinsic functions param, aws::stackname
+          # fn::sub yan fonksiyonlar gibi, stake olusunca kaynaktan istenen yeri getirir
+      UserData: #kullanimi icin documana bak
+      # aws cloudformation> template reference> reaource and property reference> Amazon EC2> AWS::EC2::Instance, dokuman icinde user data kismini incele
+        !Base64 |
+          #! /bin/bash
+          yum update -y
+          yum install python3
+          pip3 install flask
+          yum install git -y 
+          cd /home/ec2-user
+          wget -p templates https://raw.githubusercontent.com/bzynpb/aws-project/refs/heads/main/aws/projects/001-roman-numerals-converter/templates/index.html
+          wget -p templates https://raw.githubusercontent.com/bzynpb/aws-project/refs/heads/main/aws/projects/001-roman-numerals-converter/templates/result.html
+          wget https://raw.githubusercontent.com/bzynpb/aws-project/refs/heads/main/aws/projects/001-roman-numerals-converter/roman-numerals-converter-app.py
+
+
+Outputs:
+  WebSiteURL:
+    Value: !Sub 
+    - http://${WebSiteURL}
+    - WebSiteURL: !GetAtt WebServerHost.PublicDnsName
