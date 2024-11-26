@@ -22,7 +22,7 @@ Resources:
   WebSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow 22 and 80 port# Required
+      GroupDescription: Allow 22 and 80 port  # Required
       SecurityGroupIngress: # makinaya gelen trafik
         - CidrIp: 0.0.0.0/0 # onemli
           FromPort: 22 # onemli
