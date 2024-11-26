@@ -62,6 +62,7 @@ Resources:
           wget https://raw.githubusercontent.com/bzynpb/aws-project/refs/heads/main/aws/projects/001-roman-numerals-converter/templates/index.html
           wget https://raw.githubusercontent.com/bzynpb/aws-project/refs/heads/main/aws/projects/001-roman-numerals-converter/templates/result.html
           cd ..
+          python3 roman-numerals-converter-app.py
 
 
 Outputs:
