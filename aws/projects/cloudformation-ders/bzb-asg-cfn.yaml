@@ -3,8 +3,8 @@
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-formats.html
 AWSTemplateFormatVersion: 2010-09-09
 
-Description:
-  String
+Description: |
+  This CFN template create ASG and ALB with ASG Target Tracking Policy via CloudFormation template. 
 
 Parameters:
 # parameter vpc diyerek temeplate getirdik
@@ -76,7 +76,6 @@ Resources:
   myTargetGrp:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      HealthCheckEnabled: Boolean
       HealthCheckIntervalSeconds: 30
       HealthCheckPath: / # anapath'e yapilacak
       HealthCheckPort: 80
@@ -99,10 +98,8 @@ Resources:
             - !Ref myEnv # product veya test mi? secimi console'a birakiyoruz , parametre ihtiyacimiz var 
           InstanceType: !Ref myInstanceType   # *3 console'da karsimiza cikacak
           KeyName: !Ref myKeyPair
- 
           SecurityGroupIds: 
             - !Ref mySecGrp
-
           UserData: !Base64 |   # *4 loadbalancer'da kullanilan hazir datayi kullaniyoruz 
             #!/bin/bash
             #update os
@@ -177,6 +174,22 @@ Resources:
         - !Ref mySubnets
 
 
+  myASGPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: String
+      PolicyType: String
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 60
 
 Outputs:
-  set of outputs
+  # cikti bize url adresi versin
+  ShowDNS:
+    Description: DNS of ALB
+    Value: !Join
+      - ''
+      - - 'http://'
+        - !GetAtt myALB.DNSName
+
