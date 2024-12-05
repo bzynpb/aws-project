@@ -1,0 +1,62 @@
+#cfn yazip sablonu getir (cfn-template)
+# kisayol gelmediyse aws dokumanlardan alabilirsin
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-formats.html
+---
+
+AWSTemplateFormatVersion: 2010-09-09
+
+Description:
+  String
+
+
+Parameters:
+# parameter vpc diyerek temeplate getirdik
+ # birden fazla listeden sececegimiz icin liste kullandik
+  myVPC:  
+    Description: Choose your VPC
+    Type: AWS::EC2::VPC::Id
+    Default: 
+
+
+Mappings:
+  set of mappings
+
+
+
+Resources:
+  mySecGrp:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ssh and http
+      VpcId: !Ref myVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+# aws dokumanlardan getirip talebimize gore degistirdik,
+  myTargetGrp:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckEnabled: Boolean
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: / # anapath'e yapilacak
+      HealthCheckPort: 80
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5 # default 6 sn
+      HealthyThresholdCount: 3 # saglikli olma esigi, 3 health check alinca saglikli kabul eder
+      Port: 80
+      Protocol: HTTP
+      TargetType: instance
+      UnhealthyThresholdCount: 2
+      VpcId: !Ref myVPC
+
+
+
+Outputs:
+  set of outputs
