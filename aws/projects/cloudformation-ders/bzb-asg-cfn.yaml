@@ -1,13 +1,10 @@
 #cfn yazip sablonu getir (cfn-template)
 # kisayol gelmediyse aws dokumanlardan alabilirsin
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-formats.html
----
-
 AWSTemplateFormatVersion: 2010-09-09
 
 Description:
   String
-
 
 Parameters:
 # parameter vpc diyerek temeplate getirdik
@@ -15,11 +12,47 @@ Parameters:
   myVPC:  
     Description: Choose your VPC
     Type: AWS::EC2::VPC::Id
-    Default: 
+  
+  myEnv:  # *2 custom parametre yarattik 
+    Description: Choose your ENV
+    Type: string
+    Default: prod
+    AllowedValues: 
+      - prod
+      - test
 
+  myInstanceType:  # *3 
+    Description: Choose your instance type
+    Type: string
+    Default: t2.micro
+    AllowedValues: 
+      - t2.micro
+      - t3.micro
+      - t2.nano
+
+  myKeyPair: # parameter-key yazinca template otomatik geldi
+    Description: Choose your keypaor
+    Type: AWS::EC2::KeyPair::KeyName
+    # Default: cok kullandigin keypair varsa yazabilirsin
+
+  # subnet icin ozel parametre olmali, 
+  # parameter-subnet-id olmaz cunku birden fazla secim yapcaz, o yuzden list kullan
+  mySubnets:
+    Description: Choose your subnets
+    Type: List<AWS::EC2::Subnet::Id>
 
 Mappings:
-  set of mappings
+  myRegionImageMap:
+    us-east-1:
+      prod: ami-0453ec754f44f9a4a
+      test: ami-0ed83e7a78a23014e
+    us-east-2:
+      prod: ami-0c80e2b6ccb9ad6d1
+      test: ami-0a9f08a6603f3338e
+    us-west-1:
+      prod: ami-038bba9a164eb3dc1
+      test: ami-0abe6f915c415296f
+
 
 
 
@@ -55,6 +88,93 @@ Resources:
       TargetType: instance
       UnhealthyThresholdCount: 2
       VpcId: !Ref myVPC
+
+  myLT: # aws launch template dokuman icinden template data-datalari aldik
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateData: 
+          ImageId: !FindInMap # mapping kullanabilmek icin, region'a gore 2 kategori belirleyip oyle secicez (production ve test icin)
+            - myRegionImageMap
+            - "AWS::Region"
+            - !Ref myEnv # product veya test mi? secimi console'a birakiyoruz , parametre ihtiyacimiz var 
+          InstanceType: !Ref myInstanceType   # *3 console'da karsimiza cikacak
+          KeyName: !Ref myKeyPair
+ 
+          SecurityGroupIds: 
+            - !Ref mySecGrp
+
+          UserData: !Base64 |   # *4 loadbalancer'da kullanilan hazir datayi kullaniyoruz 
+            #!/bin/bash
+            #update os
+            dnf update -y
+            #install apache server
+            dnf install -y httpd
+            # get private ip address of ec2 instance using instance metadata
+            TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
+            && PRIVATE_IP=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4`
+            # get public ip address of ec2 instance using instance metadata
+            TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` \
+            && PUBLIC_IP=`curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-ipv4`
+            # get date and time of server
+            DATE_TIME=`date`
+            # set all permissions
+            chmod -R 777 /var/www/html
+            # create a custom index.html file
+            echo "<html>
+              <head>
+              <title> Application Load Balancer</title>
+              </head>
+              <body>
+                <h1>Testing Application Load Balancer</h1>
+                <h2>Congratulations! You have created an instance from Launch Template</h2>
+                <h3>This web server is launched from the launch template by BZB via CFN</h3>
+                <p>This instance is created at <b>$DATE_TIME</b></p>
+                <p>Private IP address of this instance is <b>$PRIVATE_IP</b></p>
+                <p>Public IP address of this instance is <b>$PUBLIC_IP</b></p>
+              </body>
+              </html>" > /var/www/html/index.html
+              # start apache server
+              systemctl start httpd
+              systemctl enable httpd
+
+
+  myALB:  #template'e isim verebiliriz, kalsin
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: bzb-app-alb
+      SecurityGroups:
+      - !Ref mySecGrp
+      Subnets:
+      - !Ref mySubnets
+      Type: application
+
+  myListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions: # zorunlu, inceleyerek neler yazabilecegine bak 
+        - TargetGroupArn: !GetAtt myTargetGrp.TargetGroupArn # targetgroup resourse ismini istiyor
+        - Type: forward
+      LoadBalancerArn: !GetAtt myALB.LoadBalancerArn  # zorunlu, cloud icindeki ismi istiyor o yuzden getatt
+      Port: 80
+      Protocol: HTTP
+
+  myASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: bzb-alb-19
+      DesiredCapacity: 2
+      HealthCheckGracePeriod: 300
+      HealthCheckType: ELB
+      LaunchTemplate: 
+          LaunchTemplateId: !GetAtt myLT.LaunchTemplateID
+          Version: !GetAtt myLT.DefaultVersionNumber
+      MaxSize: 3
+      MinSize: 2
+      TargetGroupARNs: 
+        - !GetAtt myTargetGrp.TargetGroupArn
+      
+      VPCZoneIdentifier: 
+        - !Ref mySubnets
 
 
 
