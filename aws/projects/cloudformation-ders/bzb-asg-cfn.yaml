@@ -177,8 +177,8 @@ Resources:
   myASGPolicy:
     Type: AWS::AutoScaling::ScalingPolicy
     Properties:
-      AutoScalingGroupName: String
-      PolicyType: String
+      AutoScalingGroupName: !Ref myASG
+      PolicyType: TargetTrackingScaling # dokumandan aldik
       TargetTrackingConfiguration:
         PredefinedMetricSpecification:
           PredefinedMetricType: ASGAverageCPUUtilization
