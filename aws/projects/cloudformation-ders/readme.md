@@ -65,3 +65,7 @@
 
     - DefaultActions: zorunlu, inceleyerek neler yazabilecegine bak 
     https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-elasticloadbalancingv2-lis
+
+template hazirlandiktan sonra:
+    --> aws > cloudformation
+    --> create stake

@@ -1,21 +1,15 @@
-#cfn yazip sablonu getir (cfn-template)
-# kisayol gelmediyse aws dokumanlardan alabilirsin
-# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-formats.html
 AWSTemplateFormatVersion: 2010-09-09
-
 Description: |
   This CFN template create ASG and ALB with ASG Target Tracking Policy via CloudFormation template. 
 
-Parameters:
-# parameter vpc diyerek temeplate getirdik
- # birden fazla listeden sececegimiz icin liste kullandik
+Parameters: # parameter vpc diyerek temeplate getirdik
   myVPC:  
     Description: Choose your VPC
     Type: AWS::EC2::VPC::Id
   
   myEnv:  # *2 custom parametre yarattik 
     Description: Choose your ENV
-    Type: string
+    Type: String
     Default: prod
     AllowedValues: 
       - prod
@@ -23,7 +17,7 @@ Parameters:
 
   myInstanceType:  # *3 
     Description: Choose your instance type
-    Type: string
+    Type: String
     Default: t2.micro
     AllowedValues: 
       - t2.micro
@@ -71,6 +65,7 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
+      VpcId: !Ref myVPC
 
 # aws dokumanlardan getirip talebimize gore degistirdik,
   myTargetGrp:
@@ -94,7 +89,7 @@ Resources:
       LaunchTemplateData: 
           ImageId: !FindInMap # mapping kullanabilmek icin, region'a gore 2 kategori belirleyip oyle secicez (production ve test icin)
             - myRegionImageMap
-            - "AWS::Region"
+            - !Ref "AWS::Region"
             - !Ref myEnv # product veya test mi? secimi console'a birakiyoruz , parametre ihtiyacimiz var 
           InstanceType: !Ref myInstanceType   # *3 console'da karsimiza cikacak
           KeyName: !Ref myKeyPair
@@ -141,8 +136,7 @@ Resources:
       Name: bzb-app-alb
       SecurityGroups:
       - !Ref mySecGrp
-      Subnets:
-      - !Ref mySubnets
+      Subnets: !Ref mySubnets
       Type: application
 
   myListener:
@@ -169,9 +163,7 @@ Resources:
       MinSize: 2
       TargetGroupARNs: 
         - !GetAtt myTargetGrp.TargetGroupArn
-      
-      VPCZoneIdentifier: 
-        - !Ref mySubnets
+      VPCZoneIdentifier: !Ref mySubnets
 
 
   myASGPolicy:
